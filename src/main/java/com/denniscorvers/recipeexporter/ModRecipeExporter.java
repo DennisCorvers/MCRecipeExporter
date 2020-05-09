@@ -4,7 +4,6 @@ import com.denniscorvers.recipeexporter.config.Config;
 import com.denniscorvers.recipeexporter.events.EventKeyInput;
 import com.denniscorvers.recipeexporter.proxy.CommonProxy;
 import com.denniscorvers.recipeexporter.util.Chat;
-import com.denniscorvers.recipeexporter.util.Constants;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Mod;
@@ -14,21 +13,28 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 
 @Mod(
-        modid = Constants.MODID, name = "Recipe Exporter",
-        version = "${version}", clientSideOnly = true
+        modid = ModRecipeExporter.MODID, name = "Recipe Exporter",
+        version = "${mod_version}", clientSideOnly = true
 )
 public class ModRecipeExporter {
 
-    @Mod.Instance(value = Constants.MODID)
+    public static final String MODID = "recipeexporter";
+    public static final String FULLMODID = "com.denniscorvers." + MODID;
+
+    @Mod.Instance(value = MODID)
     public static ModRecipeExporter instance;
-    @SidedProxy(clientSide = Constants.FULLMODID + ".proxy.ClientProxy")
+    @SidedProxy(clientSide = FULLMODID + ".proxy.ClientProxy")
     public static CommonProxy proxy;
     public static MyLogger logger;
+
+    public static String getVersion() {
+        return "${mod_version}";
+    }
 
     @Mod.EventHandler
     public void onPreInit(FMLPreInitializationEvent event) {
         logger = new MyLogger(event.getModLog());
-        Config.init(new Configuration((event.getSuggestedConfigurationFile())));
+        Config.init(new Configuration(event.getSuggestedConfigurationFile()));
         Chat.init();
 
         MinecraftForge.EVENT_BUS.register(new EventKeyInput());

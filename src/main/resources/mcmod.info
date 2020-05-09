@@ -1,16 +1,19 @@
 [
-{
-  "modid": "recipeexporter",
-  "name": "Recipe Exporter",
-  "description": "Exports available recipes to JSON.",
-  "version": "0.1",
-  "mcversion": "1.12.2",
-  "url": "",
-  "updateUrl": "",
-  "authorList": ["DennisCorvers"],
-  "credits": "",
-  "logoFile": "",
-  "screenshots": [],
-  "dependencies": []
-}
+    {
+        "modid" : "recipeexporter",
+        "name" : "Recipe Exporter",
+        "version" : "${mod_version}",
+        "mcversion" : "${mc_version}",
+        "url" : "https://github.com/DennisCorvers/MCRecipeExporter",
+        "credits" : "Created by Dennis Corvers",
+        "authorList" : [
+            "Dennis Corvers"
+        ],
+        "description" : "A mod that exports available recipes to a json file for data analysis.",
+        "logoFile" : "",
+        "updateUrl" : "",
+        "parent" : "",
+        "screenshots": [
+        ]
+    }
 ]
