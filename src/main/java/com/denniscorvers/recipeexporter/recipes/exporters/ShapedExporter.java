@@ -24,7 +24,7 @@ public class ShapedExporter implements IRecipeExporter {
         m_recipeCache = new HashMap<>(9);
     }
 
-    public void Export(ModResolver resolver) {
+    public List<IMyRecipe> Export(ModResolver resolver) {
         List<IMyRecipe> shapedRecipes = new ArrayList<>();
 
         for (IRecipe recipe : ForgeRegistries.RECIPES) {
@@ -60,5 +60,7 @@ public class ShapedExporter implements IRecipeExporter {
             m_recipeCache.clear();
             shapedRecipes.add(shRec);
         }
+
+        return shapedRecipes;
     }
 }

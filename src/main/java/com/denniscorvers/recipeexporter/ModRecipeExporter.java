@@ -13,11 +13,13 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 
 @Mod(
-        modid = ModRecipeExporter.MODID, name = "Recipe Exporter",
-        version = "${mod_version}", clientSideOnly = true
+        modid = ModRecipeExporter.MODID, name = ModRecipeExporter.MODNAME,
+        version = "${mod_version}", clientSideOnly = true,
+        guiFactory = ModRecipeExporter.FULLMODID + ".config.ConfigGui$Factory"
 )
 public class ModRecipeExporter {
 
+    public static final String MODNAME = "Recipe Exporter";
     public static final String MODID = "recipeexporter";
     public static final String FULLMODID = "com.denniscorvers." + MODID;
 

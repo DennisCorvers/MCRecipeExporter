@@ -72,6 +72,6 @@ public class GuiMain extends GuiScreen {
     }
 
     private void ButtonExportClick(Object sender) {
-        RecipeExporter.Export();
+        RecipeExporter.export();
     }
 }

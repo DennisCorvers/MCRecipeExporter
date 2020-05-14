@@ -33,6 +33,9 @@ public class ItemStackHelper {
 
         i.setName(stack.getDisplayName());
         i.setAmount(stack.getCount());
+        if (i.getName().equals("Paper")) {
+            int a = 0;
+        }
         i.setModID(resolver.Resolve(getModName(stack)));
 
         return i;

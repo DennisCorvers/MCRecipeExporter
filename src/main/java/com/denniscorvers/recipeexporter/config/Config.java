@@ -1,9 +1,13 @@
 package com.denniscorvers.recipeexporter.config;
 
+import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
+import net.minecraftforge.fml.client.config.IConfigElement;
 
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Config {
 
@@ -35,12 +39,12 @@ public class Config {
 
         String configPath = c.getConfigFile().getAbsolutePath();
         exportPath = Paths.get(configPath).getParent().getParent() + "\\RecipeExporter";
-        m_exportPath = config.get(Category.GENERAL, "ExportPath", exportPath);
+        m_exportPath = config.get(Configuration.CATEGORY_GENERAL, "ExportPath", exportPath);
         m_exportPath.setComment("The root folder to which the recipe files are exported");
 
-        m_includeShaped = config.get(Category.GENERAL, "Export Shaped Recipes", includeShaped);
-        m_includeShapeless = config.get(Category.GENERAL, "Export Shapeless Recipes", includeShapeless);
-        m_includeOreDictionary = config.get(Category.GENERAL, "Export OreDict Shaped Recipes", includeOreDictionary);
+        m_includeShaped = config.get(Configuration.CATEGORY_GENERAL, "Export Shaped Recipes", includeShaped);
+        m_includeShapeless = config.get(Configuration.CATEGORY_GENERAL, "Export Shapeless Recipes", includeShapeless);
+        m_includeOreDictionary = config.get(Configuration.CATEGORY_GENERAL, "Export OreDict Shaped Recipes", includeOreDictionary);
 
         syncConfig();
     }
@@ -55,7 +59,11 @@ public class Config {
         config.save();
     }
 
-    private static class Category {
-        public static final String GENERAL = "General";
+    public static List<IConfigElement> getConfigElements() {
+        ArrayList<IConfigElement> elements = new ArrayList<>();
+        for (Property property : config.getCategory(Configuration.CATEGORY_GENERAL).getOrderedValues()) {
+            elements.add(new ConfigElement(property));
+        }
+        return elements;
     }
 }

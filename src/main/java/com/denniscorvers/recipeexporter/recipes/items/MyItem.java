@@ -1,19 +1,23 @@
 package com.denniscorvers.recipeexporter.recipes.items;
 
+import com.google.gson.annotations.SerializedName;
 import net.minecraft.item.ItemStack;
 
 public class MyItem implements IMyItem {
     /**
      * amount
      */
+    @SerializedName("Amount")
     private int a;
     /**
      * name
      */
+    @SerializedName("Item")
     private String n;
     /**
      * Mod ID
      */
+    @SerializedName("Mod")
     private int m;
 
     public MyItem() {
