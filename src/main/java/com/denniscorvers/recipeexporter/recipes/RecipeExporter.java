@@ -3,6 +3,7 @@ package com.denniscorvers.recipeexporter.recipes;
 import com.denniscorvers.recipeexporter.ModRecipeExporter;
 import com.denniscorvers.recipeexporter.config.Config;
 import com.denniscorvers.recipeexporter.recipes.crafting.IMyRecipe;
+import com.denniscorvers.recipeexporter.recipes.exporters.IRecipeExporter;
 import com.denniscorvers.recipeexporter.recipes.exporters.OreDictExporter;
 import com.denniscorvers.recipeexporter.recipes.exporters.ShapedExporter;
 import com.denniscorvers.recipeexporter.recipes.exporters.ShapelessExporter;
@@ -12,6 +13,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 import net.lingala.zip4j.util.Zip4jConstants;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -52,20 +55,19 @@ public class RecipeExporter {
     }
 
     private void startCollecting() {
+        List<IRecipeExporter> exporters = setupExporters();
 
-        if (Config.includeShaped) {
-            ShapedExporter shapedEx = new ShapedExporter();
-            m_recipeList.addAll(shapedEx.Export(m_modResolver));
-        }
+        for (IRecipe recipe : ForgeRegistries.RECIPES) {
+            IMyRecipe result = null;
 
-        if (Config.includeShapeless) {
-            ShapelessExporter shapelessEx = new ShapelessExporter();
-            m_recipeList.addAll(shapelessEx.Export(m_modResolver));
-        }
+            for (IRecipeExporter exporter : exporters) {
+                result = exporter.process(m_modResolver, recipe);
 
-        if (Config.includeOreDictionary) {
-            OreDictExporter oreDictEx = new OreDictExporter();
-            m_recipeList.addAll(oreDictEx.Export(m_modResolver));
+                if (result != null) {
+                    m_recipeList.add(result);
+                    break;
+                }
+            }
         }
 
         //Collect mod look-up dictionary
@@ -93,5 +95,18 @@ public class RecipeExporter {
 
     private String recipeCount() {
         return String.format("%,d", m_recipeList.size());
+    }
+
+    private List<IRecipeExporter> setupExporters() {
+        List<IRecipeExporter> exporters = new ArrayList<>(4);
+        if (Config.includeShaped)
+            exporters.add(new ShapedExporter());
+        if (Config.includeShapeless)
+            exporters.add(new ShapelessExporter());
+        if (Config.includeOreDictionary)
+            exporters.add(new OreDictExporter());
+        //Add Shapeless Ore Dictionary?
+
+        return exporters;
     }
 }

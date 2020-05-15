@@ -2,9 +2,8 @@ package com.denniscorvers.recipeexporter.recipes.exporters;
 
 import com.denniscorvers.recipeexporter.recipes.ModResolver;
 import com.denniscorvers.recipeexporter.recipes.crafting.IMyRecipe;
-
-import java.util.List;
+import net.minecraft.item.crafting.IRecipe;
 
 public interface IRecipeExporter {
-    List<IMyRecipe> Export(ModResolver resolver);
+    IMyRecipe process(ModResolver resolver, IRecipe recipe);
 }
