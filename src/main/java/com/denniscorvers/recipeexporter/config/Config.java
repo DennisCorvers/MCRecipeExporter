@@ -38,7 +38,7 @@ public class Config {
         config.load();
 
         String configPath = c.getConfigFile().getAbsolutePath();
-        exportPath = Paths.get(configPath).getParent().getParent() + "\\RecipeExporter";
+        exportPath = Paths.get(configPath).getParent().getParent() + "\\recipeexporter";
         m_exportPath = config.get(Configuration.CATEGORY_GENERAL, "ExportPath", exportPath);
         m_exportPath.setComment("The root folder to which the recipe files are exported");
 

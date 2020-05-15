@@ -3,16 +3,17 @@ package com.denniscorvers.recipeexporter.recipes;
 import com.denniscorvers.recipeexporter.ModRecipeExporter;
 import com.denniscorvers.recipeexporter.config.Config;
 import com.denniscorvers.recipeexporter.recipes.crafting.IMyRecipe;
+import com.denniscorvers.recipeexporter.recipes.exporters.OreDictExporter;
 import com.denniscorvers.recipeexporter.recipes.exporters.ShapedExporter;
+import com.denniscorvers.recipeexporter.recipes.exporters.ShapelessExporter;
 import com.denniscorvers.recipeexporter.util.Chat;
 import com.denniscorvers.recipeexporter.util.MyFile;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
+import net.lingala.zip4j.util.Zip4jConstants;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,7 @@ public class RecipeExporter {
         //After export...
         String exportPath = MyFile.formatExportPath(Config.exportPath);
 
+        //TODO Multithread this part?
         if (exporter.saveToFile(exportPath)) {
             Chat.addSystemMessage("Finished exporting " + exporter.recipeCount() + " recipes.");
             Chat.addSystemMessage("Saving to " + exportPath);
@@ -50,10 +52,21 @@ public class RecipeExporter {
     }
 
     private void startCollecting() {
-        ShapedExporter shapedEx = new ShapedExporter();
 
-        if (Config.includeShaped)
+        if (Config.includeShaped) {
+            ShapedExporter shapedEx = new ShapedExporter();
             m_recipeList.addAll(shapedEx.Export(m_modResolver));
+        }
+
+        if (Config.includeShapeless) {
+            ShapelessExporter shapelessEx = new ShapelessExporter();
+            m_recipeList.addAll(shapelessEx.Export(m_modResolver));
+        }
+
+        if (Config.includeOreDictionary) {
+            OreDictExporter oreDictEx = new OreDictExporter();
+            m_recipeList.addAll(oreDictEx.Export(m_modResolver));
+        }
 
         //Collect mod look-up dictionary
         m_modList = m_modResolver.finalizeMap();
@@ -72,17 +85,10 @@ public class RecipeExporter {
         }
 
         File saveFile = MyFile.getSaveFile(path);
+        if (saveFile == null) return false;
+        if (!MyFile.trySaveJson(saveFile, json)) return false;
 
-        try {
-            FileWriter writer = new FileWriter(saveFile);
-            writer.write(json);
-            writer.close();
-        } catch (IOException | NullPointerException e) {
-            e.printStackTrace();
-            return false;
-        }
-
-        return true;
+        return MyFile.tryCompress(saveFile, Zip4jConstants.COMP_DEFLATE, Zip4jConstants.DEFLATE_LEVEL_FASTEST);
     }
 
     private String recipeCount() {
