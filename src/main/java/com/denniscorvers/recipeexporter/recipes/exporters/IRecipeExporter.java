@@ -6,4 +6,6 @@ import net.minecraft.item.crafting.IRecipe;
 
 public interface IRecipeExporter {
     IMyRecipe process(ModResolver resolver, IRecipe recipe);
+
+    boolean canProcess(IRecipe recipe);
 }

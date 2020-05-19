@@ -2,7 +2,7 @@ package com.denniscorvers.recipeexporter.recipes.items;
 
 import net.minecraft.item.ItemStack;
 
-public class MyItemStack {
+public final class MyItemStack {
     private final ItemStack m_stack;
 
     public MyItemStack(ItemStack stack) {

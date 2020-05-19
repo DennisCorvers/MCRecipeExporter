@@ -3,13 +3,13 @@ package com.denniscorvers.recipeexporter.recipes.items;
 public interface IMyItem {
     int getAmount();
 
-    void setAmount(int a);
+    void setAmount(int amount);
 
     String getName();
 
-    void setName(String n);
+    void setName(String name);
 
     int getModID();
 
-    void setModID(int m);
+    void setModID(int modID);
 }

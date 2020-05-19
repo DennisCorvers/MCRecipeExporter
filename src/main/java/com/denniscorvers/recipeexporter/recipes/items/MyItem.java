@@ -1,67 +1,66 @@
 package com.denniscorvers.recipeexporter.recipes.items;
 
 import com.google.gson.annotations.SerializedName;
-import net.minecraft.item.ItemStack;
 
 public class MyItem implements IMyItem {
     /**
      * amount
      */
     @SerializedName("Amount")
-    private int a;
+    private int m_amount;
     /**
      * name
      */
     @SerializedName("Item")
-    private String n;
+    private String m_name;
     /**
      * Mod ID
      */
     @SerializedName("Mod")
-    private int m;
+    private int m_modID;
 
     public MyItem() {
 
     }
 
     public MyItem(int amount, String displayName, int modID) {
-        this.a = amount;
-        this.n = displayName;
-        this.m = modID;
+        this.m_amount = amount;
+        this.m_name = displayName;
+        this.m_modID = modID;
     }
 
     @Override
     public int getAmount() {
-        return a;
+        return m_amount;
     }
 
     @Override
-    public void setAmount(int a) {
-        this.a = a;
+    public void setAmount(int amount) {
+        this.m_amount = amount;
     }
 
     @Override
     public String getName() {
-        return n;
+        return m_name;
     }
 
     @Override
-    public void setName(String n) {
-        this.n = n;
+    public void setName(String name) {
+        this.m_name = name;
     }
 
     @Override
     public int getModID() {
-        return m;
+        return m_modID;
     }
 
     @Override
-    public void setModID(int m) {
-        this.m = m;
+    public void setModID(int modID) {
+        this.m_modID = modID;
     }
 
     @Override
     public String toString() {
-        return n;
+        return m_name;
     }
 }

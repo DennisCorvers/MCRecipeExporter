@@ -5,44 +5,44 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 
-public abstract class MyRecipe implements IMyRecipe {
+public class MyRecipe implements IMyRecipe {
     /**
      * Collection of input items
      */
     @SerializedName("Input")
-    private final ArrayList<IMyItem> i;
+    private final ArrayList<IMyItem> m_input;
     /**
      * Output item
      */
     @SerializedName("Result")
-    private IMyItem o;
+    private IMyItem m_output;
 
     public MyRecipe() {
-        i = new ArrayList<>();
+        m_input = new ArrayList<>();
     }
 
     @Override
     public ArrayList<IMyItem> getInput() {
-        return i;
+        return m_input;
     }
 
     @Override
     public IMyItem getOutput() {
-        return o;
+        return m_output;
     }
 
     @Override
     public void setOutput(IMyItem item) {
-        o = item;
+        m_output = item;
     }
 
     @Override
     public void addInput(IMyItem item) {
-        i.add(item);
+        m_input.add(item);
     }
 
     @Override
     public String toString() {
-        return "Recipe for " + o.getName();
+        return "Recipe for " + m_output.getName();
     }
 }

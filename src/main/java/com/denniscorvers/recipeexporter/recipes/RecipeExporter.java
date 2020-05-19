@@ -4,9 +4,9 @@ import com.denniscorvers.recipeexporter.ModRecipeExporter;
 import com.denniscorvers.recipeexporter.config.Config;
 import com.denniscorvers.recipeexporter.recipes.crafting.IMyRecipe;
 import com.denniscorvers.recipeexporter.recipes.exporters.IRecipeExporter;
-import com.denniscorvers.recipeexporter.recipes.exporters.OreDictExporter;
-import com.denniscorvers.recipeexporter.recipes.exporters.ShapedExporter;
-import com.denniscorvers.recipeexporter.recipes.exporters.ShapelessExporter;
+import com.denniscorvers.recipeexporter.recipes.exporters.oredictionary.OreDictExporter;
+import com.denniscorvers.recipeexporter.recipes.exporters.vanilla.ShapedExporter;
+import com.denniscorvers.recipeexporter.recipes.exporters.vanilla.ShapelessExporter;
 import com.denniscorvers.recipeexporter.util.Chat;
 import com.denniscorvers.recipeexporter.util.MyFile;
 import com.google.gson.Gson;
@@ -86,6 +86,7 @@ public class RecipeExporter {
             return false;
         }
 
+        if (true) return true; //TODO: Remove this to store files on disk!
         File saveFile = MyFile.getSaveFile(path);
         if (saveFile == null) return false;
         if (!MyFile.trySaveJson(saveFile, json)) return false;
