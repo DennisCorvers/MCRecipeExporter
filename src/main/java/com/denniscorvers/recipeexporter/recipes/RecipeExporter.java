@@ -57,6 +57,7 @@ public class RecipeExporter {
     private void startCollecting() {
         List<IRecipeExporter> exporters = setupExporters();
 
+        //TODO Resolve items to greatly reduce export file size
         for (IRecipe recipe : ForgeRegistries.RECIPES) {
             IMyRecipe result = null;
 
@@ -86,7 +87,7 @@ public class RecipeExporter {
             return false;
         }
 
-        if (true) return true; //TODO: Remove this to store files on disk!
+        //if (true) return true; //TODO: Remove this to store files on disk!
         File saveFile = MyFile.getSaveFile(path);
         if (saveFile == null) return false;
         if (!MyFile.trySaveJson(saveFile, json)) return false;

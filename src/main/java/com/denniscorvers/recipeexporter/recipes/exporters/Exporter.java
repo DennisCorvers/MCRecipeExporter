@@ -1,9 +1,8 @@
-package com.denniscorvers.recipeexporter.recipes.exporters.vanilla;
+package com.denniscorvers.recipeexporter.recipes.exporters;
 
 import com.denniscorvers.recipeexporter.recipes.ModResolver;
 import com.denniscorvers.recipeexporter.recipes.crafting.IMyRecipe;
 import com.denniscorvers.recipeexporter.recipes.crafting.MyRecipe;
-import com.denniscorvers.recipeexporter.recipes.exporters.IRecipeExporter;
 import com.denniscorvers.recipeexporter.recipes.items.IMyItem;
 import com.denniscorvers.recipeexporter.recipes.items.MyItemStack;
 import com.denniscorvers.recipeexporter.util.ItemStackHelper;
@@ -13,11 +12,11 @@ import net.minecraft.item.crafting.Ingredient;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class VanillaExporter implements IRecipeExporter {
+public abstract class Exporter implements IRecipeExporter {
 
     protected final HashMap<MyItemStack, Integer> m_recipeCache;
 
-    public VanillaExporter() {
+    public Exporter() {
         m_recipeCache = new HashMap<>(9);
     }
 
