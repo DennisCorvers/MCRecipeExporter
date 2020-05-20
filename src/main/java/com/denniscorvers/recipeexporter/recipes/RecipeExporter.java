@@ -5,6 +5,7 @@ import com.denniscorvers.recipeexporter.config.Config;
 import com.denniscorvers.recipeexporter.recipes.crafting.IMyRecipe;
 import com.denniscorvers.recipeexporter.recipes.exporters.IRecipeExporter;
 import com.denniscorvers.recipeexporter.recipes.exporters.oredictionary.OreDictExporter;
+import com.denniscorvers.recipeexporter.recipes.exporters.oredictionary.ShapelessOreDictExporter;
 import com.denniscorvers.recipeexporter.recipes.exporters.vanilla.ShapedExporter;
 import com.denniscorvers.recipeexporter.recipes.exporters.vanilla.ShapelessExporter;
 import com.denniscorvers.recipeexporter.util.Chat;
@@ -105,9 +106,10 @@ public class RecipeExporter {
             exporters.add(new ShapedExporter());
         if (Config.includeShapeless)
             exporters.add(new ShapelessExporter());
-        if (Config.includeOreDictionary)
+        if (Config.includeOreDictionary) {
             exporters.add(new OreDictExporter());
-        //Add Shapeless Ore Dictionary?
+            exporters.add(new ShapelessOreDictExporter());
+        }
 
         return exporters;
     }

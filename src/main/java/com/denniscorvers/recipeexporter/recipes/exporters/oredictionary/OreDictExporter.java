@@ -7,6 +7,7 @@ import com.denniscorvers.recipeexporter.recipes.exporters.Exporter;
 import com.denniscorvers.recipeexporter.recipes.items.IMyItem;
 import com.denniscorvers.recipeexporter.recipes.items.MyItemStack;
 import com.denniscorvers.recipeexporter.util.ItemStackHelper;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraftforge.oredict.ShapedOreRecipe;
@@ -34,6 +35,7 @@ public class OreDictExporter extends Exporter {
         MyRecipe shRec = new MyRecipe();
         for (Map.Entry<MyItemStack, Integer> entry : m_recipeCache.entrySet()) {
             IMyItem input = ItemStackHelper.parseOreDictionaryItem(entry.getKey().getStack(), resolver);
+
             input.setAmount(entry.getValue());
             shRec.addInput(input);
         }
