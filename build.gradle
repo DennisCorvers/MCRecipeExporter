@@ -1,14 +1,20 @@
 buildscript {
     repositories {
         jcenter()
-        maven { url = "https://files.minecraftforge.net/maven" }
+        maven { url = "http://files.minecraftforge.net/maven" }
+        mavenCentral()
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
     }
 }
+
 apply plugin: 'net.minecraftforge.gradle.forge'
 
+configurations {
+    shade
+    compile.extendsFrom shade
+}
 
 version = "${mc_version}-${mod_version}"
 group = "com.denniscorvers.recipeexporter"
@@ -23,24 +29,23 @@ minecraft {
 
     version = "${mc_version}-${forge_version}"
     runDir = "run"
-    makeObfSourceJar = false
-    useDepAts = true
+    //makeObfSourceJar = false
+    //useDepAts = true
 
     replace '${mod_version}', project.version
 
     mappings = "stable_39"
 }
 
-
 repositories {
-
 }
 
 dependencies {
-    compile group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
+    shade "com.google.code.gson:gson:2.8.6"
+    shade "net.lingala.zip4j:zip4j:1.2.4"
 
-    compile group: 'net.lingala.zip4j', name: 'zip4j', version: '1.2.4'
-
+    compile fileTree(dir: 'libs', include: '*.jar')
+    compile fileTree(dir: 'libs', include: '*.zip')
 }
 
 processResources {
@@ -60,5 +65,14 @@ processResources {
     // copy everything else except the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
+    }
+}
+
+
+jar {
+    configurations.shade.each { dep ->
+        from(project.zipTree(dep)){
+            exclude 'META-INF', 'META-INF/**'
+        }
     }
 }

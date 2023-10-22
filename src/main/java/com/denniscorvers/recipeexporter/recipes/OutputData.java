@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 public class OutputData {
-    private final String RecipeCount;
+    private transient final String RecipeCount;
 
     @SerializedName("Recipes")
     private final List<IMyRecipe> Recipes;
