@@ -12,7 +12,7 @@ public class MyItem implements IMyItem {
      * name
      */
     @SerializedName("Item")
-    private String m_name;
+    private int m_itemID;
     /**
      * Mod ID
      */
@@ -23,44 +23,18 @@ public class MyItem implements IMyItem {
 
     }
 
-    public MyItem(int amount, String displayName, int modID) {
-        this.m_amount = amount;
-        this.m_name = displayName;
-        this.m_modID = modID;
-    }
-
-    @Override
-    public int getAmount() {
-        return m_amount;
-    }
-
     @Override
     public void setAmount(int amount) {
         this.m_amount = amount;
     }
 
     @Override
-    public String getName() {
-        return m_name;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.m_name = name;
-    }
-
-    @Override
-    public int getModID() {
-        return m_modID;
+    public void setItemID(int itemID) {
+        this.m_itemID = itemID;
     }
 
     @Override
     public void setModID(int modID) {
         this.m_modID = modID;
-    }
-
-    @Override
-    public String toString() {
-        return m_name;
     }
 }

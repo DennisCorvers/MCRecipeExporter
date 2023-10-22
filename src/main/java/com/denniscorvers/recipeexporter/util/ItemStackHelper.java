@@ -1,5 +1,6 @@
 package com.denniscorvers.recipeexporter.util;
 
+import com.denniscorvers.recipeexporter.recipes.ItemResolver;
 import com.denniscorvers.recipeexporter.recipes.ModResolver;
 import com.denniscorvers.recipeexporter.recipes.items.IMyItem;
 import com.denniscorvers.recipeexporter.recipes.items.MyItem;
@@ -10,15 +11,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.oredict.OreDictionary;
 
 public class ItemStackHelper {
-
-    public static String getItemName(ItemStack stack) {
-        return stack.getDisplayName();
-    }
-
-    public static int getItemAmount(ItemStack stack) {
-        return stack.getCount();
-    }
-
     public static String getModName(ItemStack stack) {
         Item i = stack.getItem();
         ResourceLocation itemName = i.getRegistryName();
@@ -30,17 +22,17 @@ public class ItemStackHelper {
         return itemName.getNamespace();
     }
 
-    public static IMyItem parseVanillaRecipe(ItemStack stack, ModResolver resolver) {
+    public static IMyItem parseVanillaRecipe(ItemStack stack, ModResolver modResolver, ItemResolver itemResolver) {
         MyItem i = new MyItem();
 
-        i.setName(stack.getDisplayName());
+        i.setItemID(itemResolver.Resolve(stack.getDisplayName()));
         i.setAmount(stack.getCount());
-        i.setModID(resolver.Resolve(getModName(stack)));
+        i.setModID(modResolver.Resolve(getModName(stack)));
 
         return i;
     }
 
-    public static IMyItem parseOreDictionaryItem(ItemStack stack, ModResolver resolver) {
+    public static IMyItem parseOreDictionaryItem(ItemStack stack, ModResolver modResolver, ItemResolver itemResolver) {
         IMyItem i;
 
         String[] names = getOreDictName(stack);
@@ -50,9 +42,9 @@ public class ItemStackHelper {
         } else
             i = new MyItem();
 
-        i.setName(stack.getDisplayName());
+        i.setItemID(itemResolver.Resolve(stack.getDisplayName()));
         i.setAmount(stack.getCount());
-        i.setModID(resolver.Resolve(getModName(stack)));
+        i.setModID(modResolver.Resolve(getModName(stack)));
 
         return i;
     }

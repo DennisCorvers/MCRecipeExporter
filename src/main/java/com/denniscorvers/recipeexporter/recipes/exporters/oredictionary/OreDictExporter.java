@@ -1,5 +1,6 @@
 package com.denniscorvers.recipeexporter.recipes.exporters.oredictionary;
 
+import com.denniscorvers.recipeexporter.recipes.ItemResolver;
 import com.denniscorvers.recipeexporter.recipes.ModResolver;
 import com.denniscorvers.recipeexporter.recipes.crafting.IMyRecipe;
 import com.denniscorvers.recipeexporter.recipes.crafting.MyRecipe;
@@ -11,6 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraftforge.oredict.ShapedOreRecipe;
+import net.minecraftforge.oredict.ShapelessOreRecipe;
 
 import java.util.Map;
 
@@ -18,10 +20,12 @@ import java.util.Map;
 public class OreDictExporter extends Exporter {
 
     @Override
-    public IMyRecipe process(ModResolver resolver, IRecipe recipe) {
-        if (!canProcess(recipe)) return null;
+    public IMyRecipe process(ModResolver modResolver, ItemResolver itemResolver, IRecipe recipe) {
+        ShapedOreRecipe shOre = recipe instanceof ShapedOreRecipe ? (ShapedOreRecipe) recipe : null;
 
-        ShapedOreRecipe shOre = (ShapedOreRecipe) recipe;
+        if(shOre == null)
+            return null;
+
         for (Ingredient ingr : shOre.getIngredients()) {
 
             if (ingr.getMatchingStacks().length < 1)
@@ -34,13 +38,13 @@ public class OreDictExporter extends Exporter {
 
         MyRecipe shRec = new MyRecipe();
         for (Map.Entry<MyItemStack, Integer> entry : m_recipeCache.entrySet()) {
-            IMyItem input = ItemStackHelper.parseOreDictionaryItem(entry.getKey().getStack(), resolver);
+            IMyItem input = ItemStackHelper.parseOreDictionaryItem(entry.getKey().getStack(), modResolver, itemResolver);
 
             input.setAmount(entry.getValue());
             shRec.addInput(input);
         }
 
-        shRec.setOutput(ItemStackHelper.parseVanillaRecipe(recipe.getRecipeOutput(), resolver));
+        shRec.setOutput(ItemStackHelper.parseVanillaRecipe(recipe.getRecipeOutput(), modResolver, itemResolver));
 
         //Clear cache after every recipe!
         m_recipeCache.clear();

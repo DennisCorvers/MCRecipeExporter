@@ -40,9 +40,4 @@ public class MyRecipe implements IMyRecipe {
     public void addInput(IMyItem item) {
         m_input.add(item);
     }
-
-    @Override
-    public String toString() {
-        return "Recipe for " + m_output.getName();
-    }
 }

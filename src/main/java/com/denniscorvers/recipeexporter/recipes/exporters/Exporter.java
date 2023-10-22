@@ -1,5 +1,6 @@
 package com.denniscorvers.recipeexporter.recipes.exporters;
 
+import com.denniscorvers.recipeexporter.recipes.ItemResolver;
 import com.denniscorvers.recipeexporter.recipes.ModResolver;
 import com.denniscorvers.recipeexporter.recipes.crafting.IMyRecipe;
 import com.denniscorvers.recipeexporter.recipes.crafting.MyRecipe;
@@ -21,7 +22,7 @@ public abstract class Exporter implements IRecipeExporter {
     }
 
     @Override
-    public IMyRecipe process(ModResolver resolver, IRecipe recipe) {
+    public IMyRecipe process(ModResolver modResolver, ItemResolver itemResolver, IRecipe recipe) {
         if (!canProcess(recipe)) return null;
 
         for (Ingredient ingr : recipe.getIngredients()) {
@@ -36,12 +37,12 @@ public abstract class Exporter implements IRecipeExporter {
 
         MyRecipe shRec = new MyRecipe();
         for (Map.Entry<MyItemStack, Integer> entry : m_recipeCache.entrySet()) {
-            IMyItem input = ItemStackHelper.parseVanillaRecipe(entry.getKey().getStack(), resolver);
+            IMyItem input = ItemStackHelper.parseVanillaRecipe(entry.getKey().getStack(), modResolver, itemResolver);
             input.setAmount(entry.getValue());
             shRec.addInput(input);
         }
 
-        shRec.setOutput(ItemStackHelper.parseVanillaRecipe(recipe.getRecipeOutput(), resolver));
+        shRec.setOutput(ItemStackHelper.parseVanillaRecipe(recipe.getRecipeOutput(), modResolver, itemResolver));
 
         //Clear cache after every recipe!
         m_recipeCache.clear();
