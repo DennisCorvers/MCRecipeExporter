@@ -5,29 +5,16 @@ import com.denniscorvers.recipeexporter.recipes.ModResolver;
 import com.denniscorvers.recipeexporter.recipes.items.IMyItem;
 import com.denniscorvers.recipeexporter.recipes.items.MyItem;
 import com.denniscorvers.recipeexporter.recipes.items.MyOreDictItem;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.oredict.OreDictionary;
 
 public class ItemStackHelper {
-    public static String getModName(ItemStack stack) {
-        Item i = stack.getItem();
-        ResourceLocation itemName = i.getRegistryName();
-
-        if (itemName == null) {
-            return "undef";
-        }
-
-        return itemName.getNamespace();
-    }
-
     public static IMyItem parseVanillaRecipe(ItemStack stack, ModResolver modResolver, ItemResolver itemResolver) {
         MyItem i = new MyItem();
 
         i.setItemID(itemResolver.resolve(stack));
         i.setAmount(stack.getCount());
-        i.setModID(modResolver.Resolve(getModName(stack)));
+        i.setModID(modResolver.resolve(stack));
 
         return i;
     }
@@ -44,7 +31,7 @@ public class ItemStackHelper {
 
         i.setItemID(itemResolver.resolve(stack));
         i.setAmount(stack.getCount());
-        i.setModID(modResolver.Resolve(getModName(stack)));
+        i.setModID(modResolver.resolve(stack));
 
         return i;
     }

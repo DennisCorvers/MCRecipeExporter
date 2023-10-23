@@ -9,12 +9,12 @@ public class MyRecipe implements IMyRecipe {
     /**
      * Collection of input items
      */
-    @SerializedName("Input")
+    @SerializedName("In")
     private final ArrayList<IMyItem> m_input;
     /**
      * Output item
      */
-    @SerializedName("Result")
+    @SerializedName("Out")
     private IMyItem m_output;
 
     public MyRecipe() {
