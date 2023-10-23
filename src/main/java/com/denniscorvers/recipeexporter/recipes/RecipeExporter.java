@@ -48,7 +48,6 @@ public class RecipeExporter {
         ModResolver modResolver = new ModResolver();
         ItemResolver itemResolver = new ItemResolver();
 
-        //TODO Resolve items to greatly reduce export file size
         for (IRecipe recipe : ForgeRegistries.RECIPES) {
             for (IRecipeExporter exporter : exporters) {
                 IMyRecipe result = exporter.process(modResolver, itemResolver, recipe);

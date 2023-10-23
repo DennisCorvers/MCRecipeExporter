@@ -25,7 +25,7 @@ public class ItemStackHelper {
     public static IMyItem parseVanillaRecipe(ItemStack stack, ModResolver modResolver, ItemResolver itemResolver) {
         MyItem i = new MyItem();
 
-        i.setItemID(itemResolver.Resolve(stack.getDisplayName()));
+        i.setItemID(itemResolver.resolve(stack));
         i.setAmount(stack.getCount());
         i.setModID(modResolver.Resolve(getModName(stack)));
 
@@ -42,7 +42,7 @@ public class ItemStackHelper {
         } else
             i = new MyItem();
 
-        i.setItemID(itemResolver.Resolve(stack.getDisplayName()));
+        i.setItemID(itemResolver.resolve(stack));
         i.setAmount(stack.getCount());
         i.setModID(modResolver.Resolve(getModName(stack)));
 
