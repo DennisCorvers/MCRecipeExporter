@@ -1,29 +1,26 @@
 package com.denniscorvers.recipeexporter.recipes.items;
 
-import net.minecraft.item.ItemStack;
+import com.google.gson.annotations.SerializedName;
 
-public final class MyItemStack {
-    private final ItemStack m_stack;
+public class MyItemStack implements IMyItemStack {
+    /**
+     * amount
+     */
+    @SerializedName("Amount")
+    private int m_amount;
+    /**
+     * name
+     */
+    @SerializedName("ItemID")
+    private int m_itemID;
 
-    public MyItemStack(ItemStack stack) {
-        m_stack = stack;
-    }
-
-    public ItemStack getStack() {
-        return m_stack;
+    public MyItemStack(int amount, int itemID) {
+        this.m_amount = amount;
+        this.m_itemID = itemID;
     }
 
     @Override
-    public int hashCode() {
-        return m_stack.getDisplayName().hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof MyItemStack)) {
-            return false;
-        }
-
-        return m_stack.isItemEqualIgnoreDurability(((MyItemStack) obj).getStack());
+    public void setAmount(int amount) {
+        m_amount = amount;
     }
 }

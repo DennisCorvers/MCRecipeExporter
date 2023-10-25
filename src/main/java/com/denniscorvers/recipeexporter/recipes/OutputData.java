@@ -1,6 +1,8 @@
 package com.denniscorvers.recipeexporter.recipes;
 
 import com.denniscorvers.recipeexporter.recipes.crafting.IMyRecipe;
+import com.denniscorvers.recipeexporter.recipes.items.IMyItem;
+import com.denniscorvers.recipeexporter.recipes.items.MyItem;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.Collection;
@@ -17,9 +19,9 @@ public class OutputData {
     private final Map<Integer, String> ModList;
 
     @SerializedName("Items")
-    private final Map<Integer, String> ItemList;
+    private final Map<Integer, IMyItem> ItemList;
 
-    public OutputData(List<IMyRecipe> recipes, Map<Integer, String> modList, Map<Integer, String> itemList) {
+    public OutputData(List<IMyRecipe> recipes, Map<Integer, String> modList, Map<Integer, IMyItem> itemList) {
         Recipes = recipes;
         ModList = modList;
         ItemList = itemList;
