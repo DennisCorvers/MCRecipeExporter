@@ -45,13 +45,11 @@ public class RecipeExporter {
         List<IRecipeExporter> exporters = setupExporters();
         List<IMyRecipe> recipeList = new ArrayList<>();
 
-        ModResolver modResolver = new ModResolver();
-        ItemResolver itemResolver = new ItemResolver();
+        ItemStackCache cache = new ItemStackCache();
 
-        //TODO Resolve items to greatly reduce export file size
         for (IRecipe recipe : ForgeRegistries.RECIPES) {
             for (IRecipeExporter exporter : exporters) {
-                IMyRecipe result = exporter.process(modResolver, itemResolver, recipe);
+                IMyRecipe result = exporter.process(cache, recipe);
 
                 if (result != null) {
                     recipeList.add(result);
@@ -63,8 +61,8 @@ public class RecipeExporter {
 
         return new OutputData(
                 recipeList,
-                modResolver.finalizeMap(),
-                itemResolver.finalizeMap());
+                cache.getModList(),
+                cache.getItemList());
     }
 
     private static List<IRecipeExporter> setupExporters() {

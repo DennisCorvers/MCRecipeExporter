@@ -1,16 +1,16 @@
 package com.denniscorvers.recipeexporter.recipes.crafting;
 
-import com.denniscorvers.recipeexporter.recipes.items.IMyItem;
+import com.denniscorvers.recipeexporter.recipes.items.IMyItemStack;
 
 import java.util.ArrayList;
 
 public interface IMyRecipe {
-    ArrayList<IMyItem> getInput();
+    ArrayList<IMyItemStack> getInput();
 
-    IMyItem getOutput();
+    IMyItemStack getOutput();
 
-    void setOutput(IMyItem item);
+    void setOutput(IMyItemStack item);
 
-    void addInput(IMyItem item);
+    void addInput(IMyItemStack item);
 }
 
