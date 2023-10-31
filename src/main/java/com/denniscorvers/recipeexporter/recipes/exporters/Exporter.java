@@ -4,7 +4,7 @@ import com.denniscorvers.recipeexporter.recipes.ItemStackCache;
 import com.denniscorvers.recipeexporter.recipes.crafting.IMyRecipe;
 import com.denniscorvers.recipeexporter.recipes.crafting.MyRecipe;
 import com.denniscorvers.recipeexporter.recipes.items.IMyItemStack;
-import com.denniscorvers.recipeexporter.recipes.items.ItemStackProxy;
+import com.denniscorvers.recipeexporter.recipes.items.MyIngredient;
 import com.denniscorvers.recipeexporter.util.ItemStackHelper;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
@@ -13,11 +13,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class Exporter implements IRecipeExporter {
-    protected final HashMap<ItemStackProxy, Integer> RecipeCache;
     protected final boolean IsActive;
 
     public Exporter(boolean isActive) {
-        RecipeCache = new HashMap<>(9);
         IsActive = isActive;
     }
 
@@ -25,7 +23,6 @@ public abstract class Exporter implements IRecipeExporter {
         if (!canProcess(recipe))
             return null;
 
-        RecipeCache.clear();
         IMyRecipe result = processRecipe(cache, recipe);
         if (result == null || !result.isValid())
             return null;
@@ -43,20 +40,22 @@ public abstract class Exporter implements IRecipeExporter {
     }
 
     protected IMyRecipe processRecipe(ItemStackCache cache, IRecipe<?> recipe) {
+        HashMap<MyIngredient, Integer> ingredientCache = new HashMap<>(9);
         for (Ingredient ingr : recipe.getIngredients()) {
 
-            if (ingr.getMatchingStacks().length < 1)
+            if (ingr.getMatchingStacks().length == 0)
                 continue;
 
-            //Create wrapper for checking if the item was already added before.
-            ItemStackProxy myItem = new ItemStackProxy(ingr.getMatchingStacks()[0]);
-            RecipeCache.put(myItem, RecipeCache.getOrDefault(myItem, 0) + 1);
+            MyIngredient myIngredient = new MyIngredient(ingr);
+            ingredientCache.put(myIngredient, ingredientCache.getOrDefault(myIngredient, 0) + 1);
         }
 
         MyRecipe shRec = new MyRecipe();
-        for (Map.Entry<ItemStackProxy, Integer> entry : RecipeCache.entrySet()) {
-            IMyItemStack input = ItemStackHelper.parseVanillaRecipe(entry.getKey().getStack(), cache);
-            input.setAmount(entry.getValue());
+        for (Map.Entry<MyIngredient, Integer> entry : ingredientCache.entrySet()) {
+            IMyItemStack input = ItemStackHelper.parseVanillaIngredient(
+                    entry.getKey().getIngredient(),
+                    entry.getValue(),
+                    cache);
             shRec.addInput(input);
         }
 

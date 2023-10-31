@@ -18,9 +18,4 @@ public class MyItemStack implements IMyItemStack {
         this.m_amount = amount;
         this.m_itemID = itemID;
     }
-
-    @Override
-    public void setAmount(int amount) {
-        m_amount = amount;
-    }
 }

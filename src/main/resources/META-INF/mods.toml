@@ -2,7 +2,7 @@ modLoader="javafml"
 loaderVersion="[34,)"
 issueTrackerURL="https://github.com/DennisCorvers/MCRecipeExporter/issues"
 
-license="MIT License"
+license="MIT"
 
 [[mods]]
 	modId="recipeexporter"

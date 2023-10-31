@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 
 group = "com.denniscorvers.recipeexporter"
 version = "$minecraft_version-$version_major.$version_minor"
-archivesBaseName = "RecipeExporter-$minecraft_version"
+archivesBaseName = "RecipeExporter"
 
 configurations {
     shade
@@ -26,8 +26,8 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:$minecraft_version-$forge_version"
 
-    compile "com.google.code.gson:gson:2.8.6"
-    compile "net.lingala.zip4j:zip4j:1.2.4"
+    shade "com.google.code.gson:gson:2.8.6"
+    shade "net.lingala.zip4j:zip4j:1.2.4"
 
     compile fileTree(dir: 'libs', include: '*.jar')
     compile fileTree(dir: 'libs', include: '*.zip')
@@ -82,12 +82,6 @@ jar {
     from sourceSets.main.output.classesDirs
     from sourceSets.main.output.resourcesDir
 
-    configurations.shade.each { dep ->
-        from(project.zipTree(dep)) {
-            exclude 'META-INF', 'META-INF/**'
-        }
-    }
-
     manifest {
         attributes([
                 "Specification-Title"     : archivesBaseName,
@@ -99,5 +93,11 @@ jar {
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
                 "Signing-Fingerprint"     : project.hasProperty('signSHA1') ? project.findProperty('signSHA1') : "unsigned"
         ])
+    }
+
+    from {
+        configurations.shade.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
     }
 }
