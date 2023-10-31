@@ -5,7 +5,7 @@ import com.denniscorvers.recipeexporter.recipes.crafting.IMyRecipe;
 import net.minecraft.item.crafting.IRecipe;
 
 public interface IRecipeExporter {
-    IMyRecipe process(ItemStackCache cache, IRecipe recipe);
+    IMyRecipe process(ItemStackCache cache, IRecipe<?> recipe);
 
-    boolean canProcess(IRecipe recipe);
+    ExporterCompatibility checkCompatibility(IRecipe<?> recipe);
 }

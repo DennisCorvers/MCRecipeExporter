@@ -1,49 +1,35 @@
 package com.denniscorvers.recipeexporter.util;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.text.Color;
+import net.minecraft.util.text.StringTextComponent;
 
 public class Chat {
+    private static StringTextComponent getHeader() {
+        StringTextComponent header = new StringTextComponent("[");
+        StringTextComponent txt = new StringTextComponent("Recipe Exporter");
+        txt.getStyle().setColor(Color.fromHex("#00FFFF"));
+        StringTextComponent end = new StringTextComponent("] ");
 
-    private static final TextComponentString m_header = new TextComponentString("");
-
-    private static void setupChatHeader() {
-        m_header.appendSibling(new TextComponentString("["));
-        TextComponentString txt = new TextComponentString("Recipe Exporter");
-        txt.getStyle().setColor(TextFormatting.AQUA);
-        m_header.appendSibling(txt);
-        m_header.appendSibling(new TextComponentString("] "));
+        header.appendSibling(txt).appendSibling(end);
+        return header;
     }
 
     public static void init() {
-        setupChatHeader();
+
     }
 
-    public static void addMessage(EntityPlayer player, String message, boolean includeHeader) {
-        TextComponentString cmp = new TextComponentString(message);
+    public static void addMessage(PlayerEntity player, String message, boolean includeHeader) {
+        StringTextComponent stc = new StringTextComponent(message);
         if (includeHeader) {
-            TextComponentString cpy = m_header.createCopy();
-            cpy.appendSibling(cmp);
-            cmp = cpy;
+            player.sendMessage(getHeader().appendSibling(stc), null);
+        } else {
+            player.sendMessage(stc, null);
         }
-        player.sendMessage(cmp);
-    }
-
-    public static void addChatMessage(EntityPlayer player, String message) {
-        addMessage(player, message, false);
-    }
-
-    public static void addChatMessage(String text) {
-        addMessage(Minecraft.getMinecraft().player, text, false);
-    }
-
-    public static void addSystemMessage(EntityPlayer player, String message) {
-        addMessage(player, message, true);
     }
 
     public static void addSystemMessage(String text) {
-        addMessage(Minecraft.getMinecraft().player, text, true);
+        addMessage(Minecraft.getInstance().player, text, true);
     }
 }

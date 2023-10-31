@@ -1,69 +1,80 @@
 package com.denniscorvers.recipeexporter.config;
 
-import net.minecraftforge.common.config.ConfigElement;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
-import net.minecraftforge.fml.client.config.IConfigElement;
+import com.electronwill.nightconfig.core.file.CommentedFileConfig;
+import com.electronwill.nightconfig.core.io.WritingMode;
+import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.file.Path;
 
+@Mod.EventBusSubscriber
 public class Config {
+    public static final ForgeConfigSpec.Builder CLIENT_BUILDER = new ForgeConfigSpec.Builder();
 
-    /**
-     * Values from config usable within code
-     */
-    public static String exportPath = "";
-    public static boolean includeShaped = true;
-    public static boolean includeShapeless = true;
-    public static boolean includeOreDictionary = true;
+    public static final Vars VARS = new Vars();
+    public static final ForgeConfigSpec CLIENT_CONFIG = CLIENT_BUILDER.build();
 
-    /**
-     * Config properties
-     */
-    private static Property m_exportPath;
-    private static Property m_includeShaped;
-    private static Property m_includeShapeless;
-    private static Property m_includeOreDictionary;
-
-    private static Configuration config;
-
-    public static Configuration getConfig() {
-        return config;
+    public static void init() {
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.CLIENT_CONFIG);
     }
 
-    public static void init(Configuration c) {
-        config = c;
-        config.load();
+    public static void loadConfig(ForgeConfigSpec spec, Path path) {
 
-        String configPath = c.getConfigFile().getAbsolutePath();
-        exportPath = Paths.get(configPath).getParent().getParent() + "\\recipeexporter";
-        m_exportPath = config.get(Configuration.CATEGORY_GENERAL, "ExportPath", exportPath);
-        m_exportPath.setComment("The root folder to which the recipe files are exported");
+        final CommentedFileConfig configData = CommentedFileConfig.builder(path)
+                .sync()
+                .autosave()
+                .writingMode(WritingMode.REPLACE)
+                .build();
 
-        m_includeShaped = config.get(Configuration.CATEGORY_GENERAL, "Export Shaped Recipes", includeShaped);
-        m_includeShapeless = config.get(Configuration.CATEGORY_GENERAL, "Export Shapeless Recipes", includeShapeless);
-        m_includeOreDictionary = config.get(Configuration.CATEGORY_GENERAL, "Export OreDict Shaped Recipes", includeOreDictionary);
-
-        syncConfig();
+        configData.load();
+        spec.setConfig(configData);
     }
 
-    public static void syncConfig() {
-        exportPath = m_exportPath.getString();
+    public static final class Vars {
+        public final ForgeConfigSpec.ConfigValue<String> exportName;
+        public final ForgeConfigSpec.ConfigValue<String> exportPath;
 
-        includeShaped = m_includeShaped.getBoolean();
-        includeShapeless = m_includeShapeless.getBoolean();
-        includeOreDictionary = m_includeOreDictionary.getBoolean();
+        public final ForgeConfigSpec.BooleanValue includeShaped;
+        public final ForgeConfigSpec.BooleanValue includeShapeless;
+        public final ForgeConfigSpec.BooleanValue includeSingleItem;
+        public final ForgeConfigSpec.BooleanValue includeSmithing;
+        public final ForgeConfigSpec.BooleanValue includeMiscItems;
 
-        config.save();
-    }
+        private Vars() {
+            CLIENT_BUILDER.push("Recipe Exporter");
+            CLIENT_BUILDER.comment("File settings:");
+            exportName = CLIENT_BUILDER
+                    .comment("Export file name. Leave empty for datetime stamped file name.")
+                    .define("File name", "");
 
-    public static List<IConfigElement> getConfigElements() {
-        ArrayList<IConfigElement> elements = new ArrayList<>();
-        for (Property property : config.getCategory(Configuration.CATEGORY_GENERAL).getOrderedValues()) {
-            elements.add(new ConfigElement(property));
+            exportPath = CLIENT_BUILDER
+                    .comment("Default export directory. Leave empty to output in current directory.")
+                    .define("Export directory", "");
+
+            CLIENT_BUILDER.comment("Exporter settings:");
+            includeShaped = CLIENT_BUILDER
+                    .comment("True to export all shaped recipes.")
+                    .define("includeShaped", true);
+
+            includeShapeless = CLIENT_BUILDER
+                    .comment("True to export all shapeless recipes.")
+                    .define("includeShapeless", true);
+
+            includeSingleItem = CLIENT_BUILDER
+                    .comment("True to export all machine related recipes (like the stonecutter).")
+                    .define("includeSingleItem", true);
+
+            includeSmithing = CLIENT_BUILDER
+                    .comment("True to export anvil/smithing related recipes.")
+                    .define("includeSmithing", false);
+
+            includeMiscItems = CLIENT_BUILDER
+                    .comment("True to export all recipes not covered by previous options.")
+                    .define("includeMiscItems", true);
+
+            CLIENT_BUILDER.pop();
         }
-        return elements;
     }
 }

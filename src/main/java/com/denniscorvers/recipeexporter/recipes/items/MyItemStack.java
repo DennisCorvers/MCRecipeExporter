@@ -12,7 +12,7 @@ public class MyItemStack implements IMyItemStack {
      * name
      */
     @SerializedName("ItemID")
-    private int m_itemID;
+    private final int m_itemID;
 
     public MyItemStack(int amount, int itemID) {
         this.m_amount = amount;

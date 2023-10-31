@@ -40,4 +40,9 @@ public class MyRecipe implements IMyRecipe {
     public void addInput(IMyItemStack item) {
         m_input.add(item);
     }
+
+    @Override
+    public boolean isValid() {
+        return m_output != null && !m_input.isEmpty();
+    }
 }

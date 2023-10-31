@@ -12,5 +12,7 @@ public interface IMyRecipe {
     void setOutput(IMyItemStack item);
 
     void addInput(IMyItemStack item);
+
+    boolean isValid();
 }
 

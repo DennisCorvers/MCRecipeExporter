@@ -1,26 +1,20 @@
 package com.denniscorvers.recipeexporter.recipes;
 
-import com.denniscorvers.recipeexporter.ModRecipeExporter;
 import com.denniscorvers.recipeexporter.config.Config;
 import com.denniscorvers.recipeexporter.recipes.crafting.IMyRecipe;
+import com.denniscorvers.recipeexporter.recipes.exporters.ExporterCompatibility;
 import com.denniscorvers.recipeexporter.recipes.exporters.IRecipeExporter;
-import com.denniscorvers.recipeexporter.recipes.exporters.oredictionary.OreDictExporter;
-import com.denniscorvers.recipeexporter.recipes.exporters.oredictionary.ShapelessOreDictExporter;
-import com.denniscorvers.recipeexporter.recipes.exporters.vanilla.ShapedExporter;
-import com.denniscorvers.recipeexporter.recipes.exporters.vanilla.ShapelessExporter;
+import com.denniscorvers.recipeexporter.recipes.exporters.vanilla.*;
 import com.denniscorvers.recipeexporter.util.Chat;
 import com.denniscorvers.recipeexporter.util.MyFile;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import net.lingala.zip4j.util.Zip4jConstants;
+import net.minecraft.client.Minecraft;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class RecipeExporter {
+
     private RecipeExporter() {
     }
 
@@ -30,14 +24,16 @@ public class RecipeExporter {
         OutputData outData = startCollecting();
 
         //After export...
-        String exportPath = MyFile.formatExportPath(Config.exportPath);
+        MyFile exportFile = MyFile.CreateFile(
+                Config.VARS.exportName.get(),
+                Config.VARS.exportPath.get(),
+                outData);
 
-        //TODO Multithread this part?
-        if (saveToFile(outData, exportPath)) {
+        if (exportFile != null && exportFile.tryPersist()) {
             Chat.addSystemMessage("Finished exporting " + outData.getRecipeCount() + " recipes.");
-            Chat.addSystemMessage("Saving to " + exportPath);
+            Chat.addSystemMessage("Saving to " + exportFile.getOutputPath());
         } else {
-            Chat.addSystemMessage("Unable to export recipes...");
+            Chat.addSystemMessage("Unable to create export file. See the error log for details.");
         }
     }
 
@@ -47,8 +43,17 @@ public class RecipeExporter {
 
         ItemStackCache cache = new ItemStackCache();
 
-        for (IRecipe recipe : ForgeRegistries.RECIPES) {
+        for (IRecipe<?> recipe : Minecraft.getInstance().world.getRecipeManager().getRecipes()) {
             for (IRecipeExporter exporter : exporters) {
+                ExporterCompatibility exc = exporter.checkCompatibility(recipe);
+
+                // Exporter is disabled for this type. Skip trying to export Recipe.
+                if (exc == ExporterCompatibility.Skip)
+                    break;
+                // Exporter doesn't operate on this type, continue to next exporter.
+                if (exc == ExporterCompatibility.Incompatible)
+                    continue;
+
                 IMyRecipe result = exporter.process(cache, recipe);
 
                 if (result != null) {
@@ -58,7 +63,6 @@ public class RecipeExporter {
             }
         }
 
-
         return new OutputData(
                 recipeList,
                 cache.getModList(),
@@ -67,35 +71,12 @@ public class RecipeExporter {
 
     private static List<IRecipeExporter> setupExporters() {
         List<IRecipeExporter> exporters = new ArrayList<>(4);
-        if (Config.includeShaped)
-            exporters.add(new ShapedExporter());
-        if (Config.includeShapeless)
-            exporters.add(new ShapelessExporter());
-        if (Config.includeOreDictionary) {
-            exporters.add(new OreDictExporter());
-            exporters.add(new ShapelessOreDictExporter());
-        }
+        exporters.add(new ShapedExporter(Config.VARS.includeShaped.get()));
+        exporters.add(new ShapelessExporter(Config.VARS.includeShapeless.get()));
+        exporters.add(new SingleItemExporter(Config.VARS.includeSingleItem.get()));
+        exporters.add(new SmithingExporter(Config.VARS.includeSmithing.get()));
+        exporters.add(new MiscExporter(Config.VARS.includeMiscItems.get()));
 
         return exporters;
-    }
-
-    private static boolean saveToFile(OutputData data, String path) {
-        Gson gson = (new GsonBuilder()).serializeNulls().create();
-        String json;
-
-        try {
-            json = gson.toJson(data);
-        } catch (Exception e) {
-            e.printStackTrace();
-            ModRecipeExporter.logger.error(e.getMessage());
-            return false;
-        }
-
-        //if (true) return true; //TODO: Remove this to store files on disk!
-        File saveFile = MyFile.getSaveFile(path);
-        if (saveFile == null) return false;
-        if (!MyFile.trySaveJson(saveFile, json)) return false;
-
-        return MyFile.tryCompress(saveFile, Zip4jConstants.COMP_DEFLATE, Zip4jConstants.DEFLATE_LEVEL_FASTEST);
     }
 }

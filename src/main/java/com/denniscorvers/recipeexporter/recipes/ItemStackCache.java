@@ -31,7 +31,7 @@ public class ItemStackCache {
     }
 
     public int getItemID(ItemStack stack) {
-        IMyItem mItem = new MyItem(stack.getDisplayName(), getModID(stack));
+        IMyItem mItem = new MyItem(stack.getDisplayName().getString(), getModID(stack));
         return m_itemCache.getID(mItem);
     }
 

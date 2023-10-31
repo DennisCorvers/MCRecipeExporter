@@ -13,17 +13,36 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class Exporter implements IRecipeExporter {
+    protected final HashMap<ItemStackProxy, Integer> RecipeCache;
+    protected final boolean IsActive;
 
-    protected final HashMap<ItemStackProxy, Integer> m_recipeCache;
-
-    public Exporter() {
-        m_recipeCache = new HashMap<>(9);
+    public Exporter(boolean isActive) {
+        RecipeCache = new HashMap<>(9);
+        IsActive = isActive;
     }
 
-    @Override
-    public IMyRecipe process(ItemStackCache cache, IRecipe recipe) {
-        if (!canProcess(recipe)) return null;
+    public final IMyRecipe process(ItemStackCache cache, IRecipe<?> recipe) {
+        if (!canProcess(recipe))
+            return null;
 
+        RecipeCache.clear();
+        IMyRecipe result = processRecipe(cache, recipe);
+        if (result == null || !result.isValid())
+            return null;
+
+        return result;
+    }
+
+    public final ExporterCompatibility checkCompatibility(IRecipe<?> recipe) {
+        if (!IsActive)
+            return ExporterCompatibility.Skip;
+
+        return canProcess(recipe) ?
+                ExporterCompatibility.Compatible :
+                ExporterCompatibility.Incompatible;
+    }
+
+    protected IMyRecipe processRecipe(ItemStackCache cache, IRecipe<?> recipe) {
         for (Ingredient ingr : recipe.getIngredients()) {
 
             if (ingr.getMatchingStacks().length < 1)
@@ -31,11 +50,11 @@ public abstract class Exporter implements IRecipeExporter {
 
             //Create wrapper for checking if the item was already added before.
             ItemStackProxy myItem = new ItemStackProxy(ingr.getMatchingStacks()[0]);
-            m_recipeCache.put(myItem, m_recipeCache.getOrDefault(myItem, 0) + 1);
+            RecipeCache.put(myItem, RecipeCache.getOrDefault(myItem, 0) + 1);
         }
 
         MyRecipe shRec = new MyRecipe();
-        for (Map.Entry<ItemStackProxy, Integer> entry : m_recipeCache.entrySet()) {
+        for (Map.Entry<ItemStackProxy, Integer> entry : RecipeCache.entrySet()) {
             IMyItemStack input = ItemStackHelper.parseVanillaRecipe(entry.getKey().getStack(), cache);
             input.setAmount(entry.getValue());
             shRec.addInput(input);
@@ -43,10 +62,8 @@ public abstract class Exporter implements IRecipeExporter {
 
         shRec.setOutput(ItemStackHelper.parseVanillaRecipe(recipe.getRecipeOutput(), cache));
 
-        //Clear cache after every recipe!
-        m_recipeCache.clear();
         return shRec;
     }
 
-    public abstract boolean canProcess(IRecipe recipe);
+    protected abstract boolean canProcess(IRecipe<?> recipe);
 }

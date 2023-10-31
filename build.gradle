@@ -1,78 +1,103 @@
 buildscript {
     repositories {
         jcenter()
-        maven { url = "http://files.minecraftforge.net/maven" }
+        maven { url = 'https://maven.minecraftforge.net' }
         mavenCentral()
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
     }
 }
 
-apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'net.minecraftforge.gradle'
+
+group = "com.denniscorvers.recipeexporter"
+version = "$minecraft_version-$version_major.$version_minor"
+archivesBaseName = "RecipeExporter-$minecraft_version"
 
 configurations {
     shade
     compile.extendsFrom shade
 }
 
-version = "${mc_version}-${mod_version}"
-group = "com.denniscorvers.recipeexporter"
-archivesBaseName = "RecipeExporter"
-
-sourceCompatibility = targetCompatibility = '1.8'
-compileJava {
-    sourceCompatibility = targetCompatibility = '1.8'
-}
-
-minecraft {
-
-    version = "${mc_version}-${forge_version}"
-    runDir = "run"
-    //makeObfSourceJar = false
-    //useDepAts = true
-
-    replace '${mod_version}', project.version
-
-    mappings = "stable_39"
-}
-
 repositories {
 }
 
 dependencies {
-    shade "com.google.code.gson:gson:2.8.6"
-    shade "net.lingala.zip4j:zip4j:1.2.4"
+    minecraft "net.minecraftforge:forge:$minecraft_version-$forge_version"
+
+    compile "com.google.code.gson:gson:2.8.6"
+    compile "net.lingala.zip4j:zip4j:1.2.4"
 
     compile fileTree(dir: 'libs', include: '*.jar')
     compile fileTree(dir: 'libs', include: '*.zip')
 }
 
-processResources {
-    // this will ensure that this task is redone when the versions change.
-    inputs.property "mod_version", project.version
-    inputs.property "mc_version", project.minecraft.version
-
-    // replace stuff in mcmod.info, nothing else
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-
-        // replace version and mcversion
-        expand 'mod_version': project.version,
-                'mc_version': project.minecraft.version
-    }
-
-    // copy everything else except the mcmod.info
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(8)
     }
 }
 
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+minecraft {
+    mappings channel: project.mcp_channel, version: project.mcp_mappings
+
+    accessTransformer = file("src/main/resources/META-INF/accesstransformer.cfg")
+
+    runs {
+        def commonRunProperties = {
+            workingDirectory project.file("run")
+
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                recipeexporter {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        client {
+            with commonRunProperties
+        }
+    }
+}
+
+processResources {
+    exclude ".cache"
+
+    filesMatching("META-INF/mods.toml") {
+        expand "version": project.version
+    }
+}
 
 jar {
+    finalizedBy "reobfJar"
+
+    from sourceSets.main.output.classesDirs
+    from sourceSets.main.output.resourcesDir
+
     configurations.shade.each { dep ->
-        from(project.zipTree(dep)){
+        from(project.zipTree(dep)) {
             exclude 'META-INF', 'META-INF/**'
         }
+    }
+
+    manifest {
+        attributes([
+                "Specification-Title"     : archivesBaseName,
+                "Specification-Vendor"    : group,
+                "Specification-Version"   : version,
+                "Implementation-Title"    : project.name,
+                "Implementation-Version"  : "${version}",
+                "Implementation-Vendor"   : group,
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                "Signing-Fingerprint"     : project.hasProperty('signSHA1') ? project.findProperty('signSHA1') : "unsigned"
+        ])
     }
 }

@@ -1,0 +1,14 @@
+modLoader="javafml"
+loaderVersion="[34,)"
+issueTrackerURL="https://github.com/DennisCorvers/MCRecipeExporter/issues"
+
+license="MIT License"
+
+[[mods]]
+	modId="recipeexporter"
+	version="${version}"
+	displayName="Recipe Exporter"
+	authors="Dennis Corvers"
+	description='''
+	A tool to export all available recipes to a JSON format.
+	'''

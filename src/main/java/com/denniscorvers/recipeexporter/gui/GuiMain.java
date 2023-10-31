@@ -1,28 +1,28 @@
 package com.denniscorvers.recipeexporter.gui;
 
 
-import com.denniscorvers.recipeexporter.gui.graphics.Colour;
-import com.denniscorvers.recipeexporter.gui.graphics.Graphics;
-import com.denniscorvers.recipeexporter.gui.graphics.MyPoint;
+import com.denniscorvers.recipeexporter.gui.graphics.Point;
 import com.denniscorvers.recipeexporter.recipes.RecipeExporter;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import com.google.common.base.Preconditions;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-import java.io.IOException;
 
-
-@SideOnly(Side.CLIENT)
-public class GuiMain extends GuiScreen {
+@OnlyIn(Dist.CLIENT)
+public class GuiMain extends Screen {
 
     private static GuiMain m_instance;
-    private MyButton buttonExport;
 
-    private GuiMain() {
+    public GuiMain() {
+        super(new StringTextComponent("Recipe Exporter"));
     }
 
-    public static GuiScreen getInstance() {
+    public static Screen getInstance() {
         if (m_instance == null) {
             m_instance = new GuiMain();
         }
@@ -31,47 +31,29 @@ public class GuiMain extends GuiScreen {
     }
 
     @Override
-    public void initGui() {
-        super.initGui();
+    protected void init() {
+        super.init();
 
-        MyPoint loc = getMidPoint(-100, -10);
+        Point loc = getMidPoint(-100, -10);
+        Button exportButton = new Button(
+                loc.x, loc.y, 200, 20,
+                new StringTextComponent("Export Recipes"), x-> RecipeExporter.export());
 
-        buttonExport = new MyButton(100, loc.x, loc.y, 200, 20, "Export Recipes");
-        buttonExport.AddListener(this::ButtonExportClick);
-        addButton(buttonExport);
+        super.addButton(exportButton);
     }
 
     @Override
-    public void drawScreen(int mx, int my, float partTicks) {
-        drawDefaultBackground();
-
-        Graphics.drawCenterText(fontRenderer,
-                "Recipe Exporter",
-                width / 2,
-                30,
-                Colour.WHITE);
-
-        super.drawScreen(mx, my, partTicks);
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+        this.renderBackground(matrixStack);
+        super.render(matrixStack, mouseX, mouseY, partialTicks);
     }
 
     @Override
-    protected void actionPerformed(GuiButton button) throws IOException {
-        super.actionPerformed(button);
-
-        if (button.id == buttonExport.id) {
-            buttonExport.Click();
-        }
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        return super.mouseReleased(mouseX, mouseY, button);
     }
 
-    private MyPoint getMidPoint() {
-        return getMidPoint(0, 0);
-    }
-
-    private MyPoint getMidPoint(int xOffset, int yOffset) {
-        return new MyPoint(width / 2 + xOffset, height / 2 + yOffset);
-    }
-
-    private void ButtonExportClick(Object sender) {
-        RecipeExporter.export();
+    private Point getMidPoint(int xOffset, int yOffset) {
+        return new Point(super.width / 2 + xOffset, super.height / 2 + yOffset);
     }
 }

@@ -5,7 +5,7 @@ import com.denniscorvers.recipeexporter.recipes.items.IMyItemStack;
 import com.denniscorvers.recipeexporter.recipes.items.MyItemStack;
 import com.denniscorvers.recipeexporter.recipes.items.MyOreDictItemStack;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.oredict.OreDictionary;
+
 
 public class ItemStackHelper {
     public static IMyItemStack parseVanillaRecipe(ItemStack stack, ItemStackCache cache) {
@@ -29,11 +29,13 @@ public class ItemStackHelper {
     }
 
     public static String[] getOreDictName(ItemStack stack) {
-        int[] ids = OreDictionary.getOreIDs(stack);
-        String[] list = new String[ids.length];
-        for (int i = 0; i < ids.length; i++) {
-            list[i] = OreDictionary.getOreName(ids[i]);
-        }
-        return list;
+        return new String[0];
+//        stack.getOrCreateTag().getString()
+//        int[] ids = OreDictionary.getOreIDs(stack);
+//        String[] list = new String[ids.length];
+//        for (int i = 0; i < ids.length; i++) {
+//            list[i] = OreDictionary.getOreName(ids[i]);
+//        }
+//        return list;
     }
 }

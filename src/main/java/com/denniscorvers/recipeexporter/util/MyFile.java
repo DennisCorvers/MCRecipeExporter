@@ -1,8 +1,13 @@
 package com.denniscorvers.recipeexporter.util;
 
+import com.denniscorvers.recipeexporter.ModRecipeExporter;
+import com.denniscorvers.recipeexporter.recipes.OutputData;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.util.Zip4jConstants;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -13,31 +18,47 @@ import java.time.format.DateTimeFormatter;
 
 
 public class MyFile {
-    public static String formatExportPath(String root) {
-        String dateTime = ZonedDateTime.now(ZoneId.of("UTC")).format(DateTimeFormatter.ofPattern("uuuu-MM-dd--HH-mm"));
-        return root + "\\" + dateTime + ".json";
+    private final File m_jsonFile;
+    private final OutputData m_data;
+
+    private MyFile(String fileName, String filePath, OutputData data) {
+        fileName = isEmptyString(fileName) ? getFileName() : fileName;
+        filePath = isEmptyString(filePath) ? getFilePath() : filePath;
+
+        m_jsonFile = getSaveFile(filePath + "\\" + fileName);
+        m_data = data;
     }
 
-    public static File getSaveFile(String path) {
-        File file = new File(path);
+    public static MyFile CreateFile(String fileName, String filePath, OutputData data) {
+        MyFile mf = new MyFile(fileName, filePath, data);
 
-        if (!file.exists()) {
-            file.getParentFile().mkdirs();
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
+        return mf.m_jsonFile == null ? null : mf;
+    }
+
+    private static <C> boolean trySaveJson(File file, C data) {
+        Gson gson = (new GsonBuilder()).serializeNulls().create();
+        try {
+            FileWriter writer = new FileWriter(file);
+            writer.write(gson.toJson(data));
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            ModRecipeExporter.LOGGER.error(e.getMessage());
+            return false;
         }
 
-        return file;
+        return true;
     }
 
-    public static boolean tryCompress(File target, int compressionMethod, int compressionLevel) {
+    private static boolean tryCompress(File file) {
+        int compressionMethod = Zip4jConstants.COMP_DEFLATE;
+        int compressionLevel = Zip4jConstants.DEFLATE_LEVEL_FASTEST;
 
-        String zipPath = target.getPath().replace(".json", ".zip");
-        ZipFile zipFile = null;
+        if (file == null)
+            return false;
+
+        String zipPath = file.getPath().replace(".json", ".zip");
+        ZipFile zipFile;
         try {
             zipFile = new ZipFile(new File(zipPath));
         } catch (ZipException e) {
@@ -49,25 +70,52 @@ public class MyFile {
         zipParameters.setCompressionLevel(compressionLevel);
 
         try {
-            zipFile.addFile(target, zipParameters);
+            zipFile.addFile(file, zipParameters);
         } catch (Exception e) {
             e.printStackTrace();
+            ModRecipeExporter.LOGGER.error(e.getMessage());
             return false;
         }
 
         return true;
     }
 
-    public static boolean trySaveJson(File target, String json) {
-        try {
-            FileWriter writer = new FileWriter(target);
-            writer.write(json);
-            writer.close();
-        } catch (IOException | NullPointerException e) {
-            e.printStackTrace();
-            return false;
+    public boolean tryPersist() {
+        return trySaveJson(m_jsonFile, m_data)
+                && tryCompress(m_jsonFile);
+    }
+
+    public String getOutputPath() {
+        return m_jsonFile.getAbsolutePath();
+    }
+
+    private File getSaveFile(String path) {
+        File file = new File(path);
+
+        if (!file.exists()) {
+            file.getParentFile().mkdirs();
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+                ModRecipeExporter.LOGGER.error(e.getMessage());
+                return null;
+            }
         }
 
-        return true;
+        return file;
+    }
+
+    private String getFilePath() {
+        return new File("").getAbsolutePath() + "\\Recipe Exports";
+    }
+
+    private String getFileName() {
+        String dateTime = ZonedDateTime.now(ZoneId.of("UTC")).format(DateTimeFormatter.ofPattern("uuuu-MM-dd--HH-mm"));
+        return dateTime + ".json";
+    }
+
+    private boolean isEmptyString(String string) {
+        return string == null || string.isEmpty();
     }
 }
