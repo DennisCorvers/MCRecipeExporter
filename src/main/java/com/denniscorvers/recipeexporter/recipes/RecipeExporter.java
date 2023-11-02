@@ -3,9 +3,11 @@ package com.denniscorvers.recipeexporter.recipes;
 import com.denniscorvers.recipeexporter.ModRecipeExporter;
 import com.denniscorvers.recipeexporter.config.Config;
 import com.denniscorvers.recipeexporter.recipes.crafting.IMyRecipe;
+import com.denniscorvers.recipeexporter.recipes.exporters.ExporterCompatibility;
 import com.denniscorvers.recipeexporter.recipes.exporters.IRecipeExporter;
 import com.denniscorvers.recipeexporter.recipes.exporters.oredictionary.OreDictExporter;
 import com.denniscorvers.recipeexporter.recipes.exporters.oredictionary.ShapelessOreDictExporter;
+import com.denniscorvers.recipeexporter.recipes.exporters.vanilla.MiscExporter;
 import com.denniscorvers.recipeexporter.recipes.exporters.vanilla.ShapedExporter;
 import com.denniscorvers.recipeexporter.recipes.exporters.vanilla.ShapelessExporter;
 import com.denniscorvers.recipeexporter.util.Chat;
@@ -30,14 +32,16 @@ public class RecipeExporter {
         OutputData outData = startCollecting();
 
         //After export...
-        String exportPath = MyFile.formatExportPath(Config.exportPath);
+        MyFile exportFile = MyFile.CreateFile(
+                Config.exportName,
+                Config.exportPath,
+                outData);
 
-        //TODO Multithread this part?
-        if (saveToFile(outData, exportPath)) {
+        if (exportFile != null && exportFile.tryPersist()) {
             Chat.addSystemMessage("Finished exporting " + outData.getRecipeCount() + " recipes.");
-            Chat.addSystemMessage("Saving to " + exportPath);
+            Chat.addSystemMessage("Saving to " + exportFile.getOutputPath());
         } else {
-            Chat.addSystemMessage("Unable to export recipes...");
+            Chat.addSystemMessage("Unable to create export file. See the error log for details.");
         }
     }
 
@@ -49,6 +53,15 @@ public class RecipeExporter {
 
         for (IRecipe recipe : ForgeRegistries.RECIPES) {
             for (IRecipeExporter exporter : exporters) {
+                ExporterCompatibility exc = exporter.checkCompatibility(recipe);
+
+                // Exporter is disabled for this type. Skip trying to export Recipe.
+                if (exc == ExporterCompatibility.Skip)
+                    break;
+                // Exporter doesn't operate on this type, continue to next exporter.
+                if (exc == ExporterCompatibility.Incompatible)
+                    continue;
+
                 IMyRecipe result = exporter.process(cache, recipe);
 
                 if (result != null) {
@@ -58,7 +71,6 @@ public class RecipeExporter {
             }
         }
 
-
         return new OutputData(
                 recipeList,
                 cache.getModList(),
@@ -66,36 +78,13 @@ public class RecipeExporter {
     }
 
     private static List<IRecipeExporter> setupExporters() {
-        List<IRecipeExporter> exporters = new ArrayList<>(4);
-        if (Config.includeShaped)
-            exporters.add(new ShapedExporter());
-        if (Config.includeShapeless)
-            exporters.add(new ShapelessExporter());
-        if (Config.includeOreDictionary) {
-            exporters.add(new OreDictExporter());
-            exporters.add(new ShapelessOreDictExporter());
-        }
+        List<IRecipeExporter> exporters = new ArrayList<>(5);
+        exporters.add(new ShapedExporter(Config.includeShaped));
+        exporters.add(new ShapelessExporter(Config.includeShapeless));
+        exporters.add(new OreDictExporter(Config.includeOreDictionary));
+        exporters.add(new ShapelessOreDictExporter(Config.includeOreDictionary));
+        exporters.add(new MiscExporter(Config.includeMisc));
 
         return exporters;
-    }
-
-    private static boolean saveToFile(OutputData data, String path) {
-        Gson gson = (new GsonBuilder()).serializeNulls().create();
-        String json;
-
-        try {
-            json = gson.toJson(data);
-        } catch (Exception e) {
-            e.printStackTrace();
-            ModRecipeExporter.logger.error(e.getMessage());
-            return false;
-        }
-
-        //if (true) return true; //TODO: Remove this to store files on disk!
-        File saveFile = MyFile.getSaveFile(path);
-        if (saveFile == null) return false;
-        if (!MyFile.trySaveJson(saveFile, json)) return false;
-
-        return MyFile.tryCompress(saveFile, Zip4jConstants.COMP_DEFLATE, Zip4jConstants.DEFLATE_LEVEL_FASTEST);
     }
 }

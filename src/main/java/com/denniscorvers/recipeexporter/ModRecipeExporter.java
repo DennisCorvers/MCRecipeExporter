@@ -3,13 +3,14 @@ package com.denniscorvers.recipeexporter;
 import com.denniscorvers.recipeexporter.config.Config;
 import com.denniscorvers.recipeexporter.events.EventKeyInput;
 import com.denniscorvers.recipeexporter.proxy.CommonProxy;
-import com.denniscorvers.recipeexporter.util.Chat;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 @Mod(
@@ -27,17 +28,11 @@ public class ModRecipeExporter {
     public static ModRecipeExporter instance;
     @SidedProxy(clientSide = FULLMODID + ".proxy.ClientProxy")
     public static CommonProxy proxy;
-    public static MyLogger logger;
-
-    public static String getVersion() {
-        return "${mod_version}";
-    }
+    public static Logger LOGGER = LogManager.getLogger(MODID);
 
     @Mod.EventHandler
     public void onPreInit(FMLPreInitializationEvent event) {
-        logger = new MyLogger(event.getModLog());
         Config.init(new Configuration(event.getSuggestedConfigurationFile()));
-        Chat.init();
 
         MinecraftForge.EVENT_BUS.register(new EventKeyInput());
 

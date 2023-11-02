@@ -6,10 +6,10 @@ import java.util.Objects;
 
 public class MyItem implements IMyItem {
     @SerializedName("Name")
-    private String m_displayName;
+    private final String m_displayName;
 
     @SerializedName("ModID")
-    private int m_modID;
+    private final int m_modID;
 
     @Override
     public boolean equals(Object o) {
@@ -42,6 +42,4 @@ public class MyItem implements IMyItem {
     public int getModID() {
         return m_modID;
     }
-
-
 }

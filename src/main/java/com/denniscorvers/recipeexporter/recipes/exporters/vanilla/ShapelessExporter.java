@@ -5,6 +5,9 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapelessRecipes;
 
 public class ShapelessExporter extends Exporter {
+    public ShapelessExporter(boolean isActive) {
+        super(isActive);
+    }
 
     @Override
     public boolean canProcess(IRecipe recipe) {

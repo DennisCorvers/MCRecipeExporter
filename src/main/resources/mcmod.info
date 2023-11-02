@@ -1,19 +1,17 @@
 [
     {
-        "modid" : "recipeexporter",
-        "name" : "Recipe Exporter",
+        "modid": "recipeexporter",
+        "name": "Recipe Exporter",
+        "description": "A mod that exports available recipes to a json file for data analysis.",
+        "credits" : "Created by Dennis Corvers",
         "version" : "0.1",
         "mcversion" : "1.12.2",
         "url" : "https://github.com/DennisCorvers/MCRecipeExporter",
-        "credits" : "Created by Dennis Corvers",
         "authorList" : [
             "Dennis Corvers"
         ],
-        "description" : "A mod that exports available recipes to a json file for data analysis.",
-        "logoFile" : "",
-        "updateUrl" : "",
-        "parent" : "",
-        "screenshots": [
+        "dependencies": [
+            "mod_MinecraftForge"
         ]
     }
 ]

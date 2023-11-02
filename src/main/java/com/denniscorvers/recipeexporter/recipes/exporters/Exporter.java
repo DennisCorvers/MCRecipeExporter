@@ -4,7 +4,7 @@ import com.denniscorvers.recipeexporter.recipes.ItemStackCache;
 import com.denniscorvers.recipeexporter.recipes.crafting.IMyRecipe;
 import com.denniscorvers.recipeexporter.recipes.crafting.MyRecipe;
 import com.denniscorvers.recipeexporter.recipes.items.IMyItemStack;
-import com.denniscorvers.recipeexporter.recipes.items.ItemStackProxy;
+import com.denniscorvers.recipeexporter.recipes.items.MyIngredient;
 import com.denniscorvers.recipeexporter.util.ItemStackHelper;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
@@ -13,40 +13,58 @@ import java.util.HashMap;
 import java.util.Map;
 
 public abstract class Exporter implements IRecipeExporter {
+    protected final boolean IsActive;
 
-    protected final HashMap<ItemStackProxy, Integer> m_recipeCache;
-
-    public Exporter() {
-        m_recipeCache = new HashMap<>(9);
+    public Exporter(boolean isActive) {
+        IsActive = isActive;
     }
 
     @Override
-    public IMyRecipe process(ItemStackCache cache, IRecipe recipe) {
-        if (!canProcess(recipe)) return null;
+    public final IMyRecipe process(ItemStackCache cache, IRecipe recipe) {
+        if (!canProcess(recipe))
+            return null;
 
+        IMyRecipe result = processRecipe(cache, recipe);
+        if (result == null || !result.isValid())
+            return null;
+
+        return result;
+    }
+
+    @Override
+    public final ExporterCompatibility checkCompatibility(IRecipe recipe) {
+        if (!IsActive)
+            return ExporterCompatibility.Skip;
+
+        return canProcess(recipe) ?
+                ExporterCompatibility.Compatible :
+                ExporterCompatibility.Incompatible;
+    }
+
+    protected IMyRecipe processRecipe(ItemStackCache cache, IRecipe recipe) {
+        HashMap<MyIngredient, Integer> ingredientCache = new HashMap<>(9);
         for (Ingredient ingr : recipe.getIngredients()) {
 
-            if (ingr.getMatchingStacks().length < 1)
+            if (ingr.getMatchingStacks().length == 0)
                 continue;
 
-            //Create wrapper for checking if the item was already added before.
-            ItemStackProxy myItem = new ItemStackProxy(ingr.getMatchingStacks()[0]);
-            m_recipeCache.put(myItem, m_recipeCache.getOrDefault(myItem, 0) + 1);
+            MyIngredient myIngredient = new MyIngredient(ingr);
+            ingredientCache.put(myIngredient, ingredientCache.getOrDefault(myIngredient, 0) + 1);
         }
 
         MyRecipe shRec = new MyRecipe();
-        for (Map.Entry<ItemStackProxy, Integer> entry : m_recipeCache.entrySet()) {
-            IMyItemStack input = ItemStackHelper.parseVanillaRecipe(entry.getKey().getStack(), cache);
-            input.setAmount(entry.getValue());
+        for (Map.Entry<MyIngredient, Integer> entry : ingredientCache.entrySet()) {
+            IMyItemStack input = ItemStackHelper.parseVanillaIngredient(
+                    entry.getKey().getIngredient(),
+                    entry.getValue(),
+                    cache);
             shRec.addInput(input);
         }
 
         shRec.setOutput(ItemStackHelper.parseVanillaRecipe(recipe.getRecipeOutput(), cache));
 
-        //Clear cache after every recipe!
-        m_recipeCache.clear();
         return shRec;
     }
 
-    public abstract boolean canProcess(IRecipe recipe);
+    protected abstract boolean canProcess(IRecipe recipe);
 }
