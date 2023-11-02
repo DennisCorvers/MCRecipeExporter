@@ -21,7 +21,7 @@ public class KeyInputEvents {
 
     private static void onKeyPressed(Minecraft mc, InputEvent.KeyInputEvent event) {
         if (mc.currentScreen == null && Keybindings.ExportKey.isPressed()) {
-            Minecraft.getInstance().displayGuiScreen(GuiMain.getInstance());
+            mc.displayGuiScreen(GuiMain.getInstance());
         }
     }
 }
