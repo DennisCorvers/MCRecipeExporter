@@ -22,7 +22,7 @@ public class MyFile {
     private final OutputData m_data;
 
     private MyFile(String fileName, String filePath, OutputData data) {
-        fileName = isEmptyString(fileName) ? getFileName() : fileName;
+        fileName = isEmptyString(fileName) ? getFileName() : fileName + ".json";
         filePath = isEmptyString(filePath) ? getFilePath() : filePath;
 
         m_jsonFile = getSaveFile(filePath + "\\" + fileName);

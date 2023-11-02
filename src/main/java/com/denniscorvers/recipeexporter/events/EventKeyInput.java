@@ -1,24 +1,27 @@
 package com.denniscorvers.recipeexporter.events;
 
+import com.denniscorvers.recipeexporter.ModRecipeExporter;
 import com.denniscorvers.recipeexporter.gui.GuiMain;
-import com.denniscorvers.recipeexporter.proxy.ClientProxy;
-import com.denniscorvers.recipeexporter.util.Chat;
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-
+@Mod.EventBusSubscriber(modid = ModRecipeExporter.MODID, value = Side.CLIENT)
 public class EventKeyInput {
+    @SubscribeEvent
+    public static void onKeyInput(InputEvent.KeyInputEvent event) {
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc.world == null)
+            return;
 
-    @SideOnly(Side.CLIENT)
-    @SubscribeEvent(priority = EventPriority.NORMAL, receiveCanceled = true)
-    public void onKeyInput(InputEvent.KeyInputEvent event) {
+        onKeyPressed(mc, event);
+    }
 
-        if (ClientProxy.keyStartExport != null && ClientProxy.keyStartExport.isPressed()) {
-            Minecraft.getMinecraft().displayGuiScreen(GuiMain.getInstance());
+    private static void onKeyPressed(Minecraft mc, InputEvent.KeyInputEvent event) {
+        if (mc.currentScreen == null && Keybindings.ExportKey.isPressed()) {
+            mc.displayGuiScreen(GuiMain.getInstance());
         }
     }
 }

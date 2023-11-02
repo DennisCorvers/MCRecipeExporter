@@ -1,9 +1,12 @@
 package com.denniscorvers.recipeexporter.config;
 
+import com.denniscorvers.recipeexporter.ModRecipeExporter;
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.client.config.IConfigElement;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,10 +33,6 @@ public class Config {
 
     private static Configuration config;
 
-    public static Configuration getConfig() {
-        return config;
-    }
-
     public static void init(Configuration c) {
         config = c;
         config.load();
@@ -44,15 +43,31 @@ public class Config {
         m_exportName = config.get(Configuration.CATEGORY_GENERAL, "ExportName", "");
         m_exportName.setComment("Default export directory. Leave empty to output in current directory.");
 
-        m_includeShaped = config.get(Configuration.CATEGORY_GENERAL, "Export Shaped Recipes", includeShaped);
-        m_includeShapeless = config.get(Configuration.CATEGORY_GENERAL, "Export Shapeless Recipes", includeShapeless);
-        m_includeOreDictionary = config.get(Configuration.CATEGORY_GENERAL, "Export OreDict Shaped Recipes", includeOreDictionary);
-        m_includeMiscItems = config.get(Configuration.CATEGORY_GENERAL, "Export OreDict Shaped Recipes", includeMisc);
+        m_includeShaped = config.get(Configuration.CATEGORY_GENERAL, "IncludeShaped", includeShaped);
+        m_includeShaped.setComment("True to export all shaped recipes.");
+
+        m_includeShapeless = config.get(Configuration.CATEGORY_GENERAL, "IncludeShapeless", includeShapeless);
+        m_includeShapeless.setComment("True to export all shapeless recipes.");
+
+        m_includeOreDictionary = config.get(Configuration.CATEGORY_GENERAL, "IncludeOreDictionary", includeOreDictionary);
+        m_includeOreDictionary.setComment("True to export all ore dictionary recipes.");
+
+        m_includeMiscItems = config.get(Configuration.CATEGORY_GENERAL, "IncludeMiscItems", includeMisc);
+        m_includeMiscItems.setComment("True to export all recipes not covered by previous options.");
 
         syncConfig();
     }
 
-    public static void syncConfig() {
+    @SubscribeEvent
+    public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
+        if (!event.getModID().equals(ModRecipeExporter.MODID)) {
+            return;
+        }
+
+        syncConfig();
+    }
+
+    private static void syncConfig() {
         exportPath = m_exportPath.getString();
         exportName = m_exportName.getString();
 

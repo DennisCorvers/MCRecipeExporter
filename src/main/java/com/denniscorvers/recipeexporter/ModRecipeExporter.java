@@ -2,11 +2,10 @@ package com.denniscorvers.recipeexporter;
 
 import com.denniscorvers.recipeexporter.config.Config;
 import com.denniscorvers.recipeexporter.events.EventKeyInput;
-import com.denniscorvers.recipeexporter.proxy.CommonProxy;
+import com.denniscorvers.recipeexporter.events.Keybindings;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import org.apache.logging.log4j.LogManager;
@@ -26,21 +25,25 @@ public class ModRecipeExporter {
 
     @Mod.Instance(value = MODID)
     public static ModRecipeExporter instance;
-    @SidedProxy(clientSide = FULLMODID + ".proxy.ClientProxy")
-    public static CommonProxy proxy;
     public static Logger LOGGER = LogManager.getLogger(MODID);
+
+    public ModRecipeExporter() {
+        // Register ourselves for server and other game events we are interested in
+        MinecraftForge.EVENT_BUS.register(this);
+    }
 
     @Mod.EventHandler
     public void onPreInit(FMLPreInitializationEvent event) {
         Config.init(new Configuration(event.getSuggestedConfigurationFile()));
 
-        MinecraftForge.EVENT_BUS.register(new EventKeyInput());
+        Keybindings.register();
 
-        proxy.preInit();
+        MinecraftForge.EVENT_BUS.register(Config.class);
+        MinecraftForge.EVENT_BUS.register(EventKeyInput.class);
     }
 
     @Mod.EventHandler
     public void onInit(FMLInitializationEvent event) {
-        proxy.init();
+
     }
 }
