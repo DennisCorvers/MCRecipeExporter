@@ -6,6 +6,8 @@ import com.denniscorvers.recipeexporter.recipes.crafting.MyRecipe;
 import com.denniscorvers.recipeexporter.recipes.items.IMyItemStack;
 import com.denniscorvers.recipeexporter.recipes.items.MyIngredient;
 import com.denniscorvers.recipeexporter.util.ItemStackHelper;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
 
@@ -17,6 +19,10 @@ public abstract class Exporter implements IRecipeExporter {
 
     public Exporter(boolean isActive) {
         IsActive = isActive;
+    }
+
+    private static boolean isValidItem(ItemStack stack) {
+        return stack.getItem() != Items.AIR;
     }
 
     @Override
@@ -48,9 +54,16 @@ public abstract class Exporter implements IRecipeExporter {
             if (ingr.getMatchingStacks().length == 0)
                 continue;
 
+            if (!isValidItem(ingr.getMatchingStacks()[0]))
+                continue;
+
             MyIngredient myIngredient = new MyIngredient(ingr);
             ingredientCache.put(myIngredient, ingredientCache.getOrDefault(myIngredient, 0) + 1);
         }
+
+        // No inputs found for recipe means we have no valid recipe.
+        if (ingredientCache.isEmpty())
+            return null;
 
         MyRecipe shRec = new MyRecipe();
         for (Map.Entry<MyIngredient, Integer> entry : ingredientCache.entrySet()) {

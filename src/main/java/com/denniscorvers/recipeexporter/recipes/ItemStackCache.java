@@ -6,7 +6,6 @@ import com.denniscorvers.recipeexporter.util.IndexedMap;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.oredict.OreDictionary;
 
 import java.util.Map;
 
@@ -18,7 +17,6 @@ public class ItemStackCache {
     public ItemStackCache() {
         m_itemCache = new IndexedMap<>();
         m_modCache = new IndexedMap<>();
-
     }
 
     private static String getModName(ItemStack stack) {
@@ -33,7 +31,7 @@ public class ItemStackCache {
     }
 
     public int getItemID(ItemStack stack) {
-        IMyItem mItem = new MyItem(stack.getDisplayName(), getModID(stack));
+        IMyItem mItem = new MyItem(stack, getModID(stack));
         return m_itemCache.getID(mItem);
     }
 
