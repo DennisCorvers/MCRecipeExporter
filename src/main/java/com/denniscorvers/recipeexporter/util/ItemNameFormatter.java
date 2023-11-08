@@ -4,23 +4,22 @@ public class ItemNameFormatter {
     private static final char ColourCodeCharacter = (char) 167;
 
     public static String FormatName(String name) {
-        int index = IndexOf(name, ColourCodeCharacter);
-        if (index < 0)
+        if (IndexOf(name, ColourCodeCharacter) == -1)
             return name;
 
         // At least one occurrence of a colour code. StringBuilder length therefor
         // is at least 2 shorter than the input string.
         StringBuilder sb = new StringBuilder(name.length() - 2);
-        while (index < name.length()) {
-            char current = name.charAt(index);
+        for (int i = 0; i < name.length(); ) {
+            char current = name.charAt(i);
             // If colour code character is found, skip two characters in the input.
             if (current == ColourCodeCharacter) {
-                index += 2;
+                i += 2;
                 continue;
             }
 
             sb.append(current);
-            index++;
+            i++;
         }
 
         return sb.toString();
