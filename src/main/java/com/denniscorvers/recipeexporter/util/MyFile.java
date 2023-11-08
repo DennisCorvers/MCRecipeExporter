@@ -2,15 +2,14 @@ package com.denniscorvers.recipeexporter.util;
 
 import com.denniscorvers.recipeexporter.ModRecipeExporter;
 import com.denniscorvers.recipeexporter.recipes.OutputData;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.denniscorvers.recipeexporter.serialization.IJsonSerializer;
+import com.denniscorvers.recipeexporter.serialization.JsonSerializer;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.model.ZipParameters;
 import net.lingala.zip4j.util.Zip4jConstants;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -22,8 +21,8 @@ public class MyFile {
     private final OutputData m_data;
 
     private MyFile(String fileName, String filePath, OutputData data) {
-        fileName = isEmptyString(fileName) ? getFileName() : fileName + ".json";
-        filePath = isEmptyString(filePath) ? getFilePath() : filePath;
+        fileName = isEmptyString(fileName) ? getDefaultFileName() : fileName + ".json";
+        filePath = isEmptyString(filePath) ? getDefaultFilePath() : filePath;
 
         m_jsonFile = getSaveFile(filePath + "\\" + fileName);
         m_data = data;
@@ -36,11 +35,9 @@ public class MyFile {
     }
 
     private static <C> boolean trySaveJson(File file, C data) {
-        Gson gson = (new GsonBuilder()).serializeNulls().create();
+        IJsonSerializer serializer = new JsonSerializer();
         try {
-            FileWriter writer = new FileWriter(file);
-            writer.write(gson.toJson(data));
-            writer.close();
+            serializer.serialize(data, file);
         } catch (Exception e) {
             e.printStackTrace();
             ModRecipeExporter.LOGGER.error(e.getMessage());
@@ -106,11 +103,11 @@ public class MyFile {
         return file;
     }
 
-    private String getFilePath() {
+    private String getDefaultFilePath() {
         return new File("").getAbsolutePath() + "\\Recipe Exports";
     }
 
-    private String getFileName() {
+    private String getDefaultFileName() {
         String dateTime = ZonedDateTime.now(ZoneId.of("UTC")).format(DateTimeFormatter.ofPattern("uuuu-MM-dd--HH-mm"));
         return dateTime + ".json";
     }

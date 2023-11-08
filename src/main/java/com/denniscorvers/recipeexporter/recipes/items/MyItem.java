@@ -1,21 +1,19 @@
 package com.denniscorvers.recipeexporter.recipes.items;
 
-import com.google.gson.annotations.SerializedName;
+import com.denniscorvers.recipeexporter.serialization.JsonGetter;
+import com.denniscorvers.recipeexporter.util.ItemNameFormatter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 import java.util.Objects;
 
 public class MyItem implements IMyItem {
-    @SerializedName("Name")
     private final String m_displayName;
-
-    @SerializedName("ModID")
     private final int m_modID;
 
     // Item ID and Metadata used to differentiate items besides ModID and Item Name
-    private transient final int m_id;
-    private transient final int m_metaData;
+    private final int m_id;
+    private final int m_metaData;
 
     public MyItem(ItemStack stack, int modID) {
         Item item = stack.getItem();
@@ -25,6 +23,16 @@ public class MyItem implements IMyItem {
 
         m_id = Item.getIdFromItem(item);
         m_metaData = item.getMetadata(stack);
+    }
+
+    @JsonGetter("Name")
+    public String getFormattedName() {
+        return ItemNameFormatter.FormatName(m_displayName);
+    }
+
+    @JsonGetter("ModID")
+    public int getModID() {
+        return m_modID;
     }
 
     @Override
